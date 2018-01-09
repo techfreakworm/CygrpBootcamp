@@ -1,0 +1,5 @@
+CREATE PROCEDURE FetchEmployee
+AS
+BEGIN
+SELECT * FROM dbo.EmployeeDetail
+END

@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <div>
+        <h2>All Products</h2>
+        <ul id="products" />
+    </div>
+    <div>
+        <h2>Search by ID</h2>
+        <input type="text" id="searchId" size="5" />
+        <input type="button" value="Search" onclick="find();" />
+        <input type="button" value="Delete" onclick="deleteRec();" />
+        <input type="button" value="Update" onclick="update();" />
+        <p id="product" />
+        <div id="on-update" style="display: none">
+            <label>Product ID</label>
+            <input type="text" id="updateId" size="5" >
+            <br />
+            <label>Product Name</label>
+            <input type="text" id="updateName" size="5" />
+            <br />
+            <label>Product Category</label>
+            <input type="text" id="updateCategory" size="5" />
+            <br />
+            <label>Product Price</label>
+            <input type="text" id="updatePrice" size="5" />
+            <br />
+            <button id="createButton" onclick="saveUpdate();">Save</button>
+        </div>
+
+        <div>
+            <h2>Add an Item</h2>
+            <div>
+                <label>Product ID</label>
+                <input type="text" id="addId" size="5" />
+                <br />
+                <label>Product Name</label>
+                <input type="text" id="addName" size="5" />
+                <br />
+                <label>Product Category</label>
+                <input type="text" id="addCategory" size="5" />
+                <br />
+                <label>Product Price</label>
+                <input type="text" id="addPrice" size="5" />
+                <br />
+                <button id="createButton" onclick="create();">Create</button>
+
+            </div>
+
+        </div>
+
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+        <script>
+            var uri = 'api/products';
+
+            $(document).ready(function () {
+                // Send an AJAX request
+                $.getJSON(uri)
+                    .done(function (data) {
+                        // On success, 'data' contains a list of products.
+                        $.each(data, function (key, item) {
+                            // Add a list item for the product.
+                            $('<li>', { text: formatItem(item) }).appendTo($('#products'));
+                        });
+                    });
+            });
+            function formatItem(item) {
+                return item.Name + ': $' + item.Price;
+            }
+
+            function find() {
+                var id = $('#searchId').val();
+                $.getJSON(uri + '/' + id)
+                    .done(function (data) {
+                        $('#product').text(formatItem(data));
+                    })
+                    .fail(function (jqXHR, textStatus, err) {
+                        $('#product').text('Error: ' + err);
+                    });
+            }
+
+            function deleteRec() {
+                
+                var id = $('#searchId').val();
+                $.ajax({
+                    url: uri + '/' + id,
+                    cache: false,
+                    type: 'DELETE',
+                    contentType: "application/json;charset=utf-8",
+                    data: id
+                })
+
+            }
+
+            var data2;
+            function update() {
+                var id = $('#searchId').val();
+                $.ajax({
+                    url: uri + '/' + id,
+                    type: 'GET',
+                    dataType: "json",
+                    success: function (data) {
+                        data2 = data;
+                        document.getElementById("updateId").value = data2.Id;
+                        document.getElementById("updateName").value = data2.Name;
+                        document.getElementById("updateCategory").value = data2.Category;
+                        document.getElementById("updatePrice").value = data2.Price;
+                    }
+                })
+                
+                document.getElementById("on-update").style.display = 'block';
+            }
+
+            function saveUpdate() {
+                
+                var product = {
+                    Id: $('#updateId').val(),
+                    Name: $('#updateName').val(),
+                    Category: $('#updateCategory').val(),
+                    Price: $('updatePrice').val()
+                };
+                var id = product.Id;
+                console.log(product);
+
+                $.ajax({
+                    url: uri + '/' + id,
+                    type: 'PUT',
+                    dataType: 'json',
+                    data: product,
+                    success: function () {
+                        alert("Update successful")
+                    }
+                })
+            }
+
+            function create() {
+                var product = {
+                    Id: $('#addId').val(),
+                    Name: $('#addName').val(),
+                    Category: $('#addCategory').val(),
+                    Price: $('#addPrice').val()
+                };
+
+                $.ajax({
+                    url: uri + '/PostProduct',
+                    cache: false,
+                    type: 'POST',
+                    dataType: "json",
+                    data: product,
+                    success: function (msg) {
+                        if (msg) {
+                            alert("Addition successful with" + msg);
+                        }
+                        else
+                            alert("Addition not sucessful");
+                    }
+                })
+            }
+        </script>
+
+</body >
+</html >
