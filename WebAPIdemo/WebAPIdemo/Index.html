@@ -19,7 +19,7 @@
         <p id="product" />
         <div id="on-update" style="display: none">
             <label>Product ID</label>
-            <input type="text" id="updateId" size="5" >
+            <input type="text" id="updateId" size="5" disabled >
             <br />
             <label>Product Name</label>
             <input type="text" id="updateName" size="5" />
@@ -32,7 +32,7 @@
             <br />
             <button id="createButton" onclick="saveUpdate();">Save</button>
         </div>
-
+        </div>
         <div>
             <h2>Add an Item</h2>
             <div>
@@ -57,6 +57,7 @@
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
         <script>
             var uri = 'api/products';
+            var prodPID;
 
             $(document).ready(function () {
                 // Send an AJAX request
@@ -71,6 +72,7 @@
             });
             function formatItem(item) {
                 return item.Name + ': $' + item.Price;
+                prodPID = item.PID;
             }
 
             function find() {
@@ -119,10 +121,11 @@
             function saveUpdate() {
                 
                 var product = {
+                    PID: prodPID,
                     Id: $('#updateId').val(),
                     Name: $('#updateName').val(),
                     Category: $('#updateCategory').val(),
-                    Price: $('updatePrice').val()
+                    Price: $('#updatePrice').val()
                 };
                 var id = product.Id;
                 console.log(product);
@@ -130,7 +133,7 @@
                 $.ajax({
                     url: uri + '/' + id,
                     type: 'PUT',
-                    dataType: 'json',
+                    dataType: "json",
                     data: product,
                     success: function () {
                         alert("Update successful")

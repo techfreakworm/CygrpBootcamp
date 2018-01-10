@@ -18,6 +18,7 @@ namespace WebAPIdemo.Controllers
             return db.Products;
         }
 
+        [HttpGet]
         public IHttpActionResult GetProduct(int id)
         {
             var products = db.Products;
@@ -29,6 +30,7 @@ namespace WebAPIdemo.Controllers
             return Ok(product);
         }
 
+        [HttpPost]
         public HttpResponseMessage PostProduct(Product product)
         {
             var response = Request.CreateResponse<Product>(HttpStatusCode.Created, product);
@@ -42,17 +44,21 @@ namespace WebAPIdemo.Controllers
 
         }
 
+
+        [HttpDelete]
         public void DeleteProduct(int id)
         {
             Product item = db.Products.Where(p => p.Id==id).FirstOrDefault<Product>();
             db.Entry(item).State = System.Data.Entity.EntityState.Deleted;
             db.SaveChanges();
         }
+
+        [HttpPut]
         public void PutProduct(Product product)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(product).State = System.Data.Entity.EntityState.Modified;
+                db.Database.ExecuteSqlCommand("EXEC InsertProduct "+ " "+product.Id+ "," + product.Name+ "," + product.Category+ "," + product.Price );
                 db.SaveChanges();
             }
             else
